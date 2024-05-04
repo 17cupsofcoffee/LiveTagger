@@ -91,6 +91,8 @@ public class Xmp
 
         foreach (string file in files)
         {
+            var tagsAdded = new List<string>();
+
             var existingItem = itemsBag.Elements(Rdf.Li).FirstOrDefault(e => e.Element(Ableton.FilePath).Value == file);
 
             if (existingItem != null)
@@ -100,33 +102,37 @@ public class Xmp
 
                 foreach (string tag in tags)
                 {
+
                     if (!keywordBag.Elements(Rdf.Li).Any(e => e.Value == tag))
                     {
                         keywordBag.Add(new XElement(Rdf.Li, tag));
+                        tagsAdded.Add(tag);
                         IsDirty = true;
-                        Console.WriteLine($"Added tag '{tag}' to {file}");
                     }
                 }
             }
             else
             {
                 // Create new item
-                foreach (string tag in tags)
-                {
-                    var newItem = new XElement(Rdf.Li, new XAttribute(Rdf.ParseType, "Resource"),
-                        new XElement(Ableton.FilePath, file),
-                        new XElement(Ableton.Keywords,
-                            new XElement(Rdf.Bag,
-                                new XElement(Rdf.Li, tag)
-                            )
+                var newItem = new XElement(Rdf.Li, new XAttribute(Rdf.ParseType, "Resource"),
+                    new XElement(Ableton.FilePath, file),
+                    new XElement(Ableton.Keywords,
+                        new XElement(Rdf.Bag,
+                            tags.Select(tag => new XElement(Rdf.Li, tag))
                         )
-                    );
+                    )
+                );
 
-                    itemsBag.Add(newItem);
-                    IsDirty = true;
-                    Console.WriteLine($"Added tag '{tag}' to {file}");
-                }
+                itemsBag.Add(newItem);
+                tagsAdded = tags;
+                IsDirty = true;
             }
+
+            if (tagsAdded.Count > 0)
+            {
+                Console.WriteLine($"Added tags to {file}: {string.Join(", ", tagsAdded)}");
+            }
+
         }
     }
 
@@ -145,14 +151,33 @@ public class Xmp
 
             if (item != null)
             {
-                foreach (XElement keyword in item.Element(Ableton.Keywords).Element(Rdf.Bag).Elements(Rdf.Li))
+                var keywordBag = item.Element(Ableton.Keywords).Element(Rdf.Bag);
+
+                var tagsRemoved = new List<string>();
+                var elementsToRemove = new List<XElement>();
+
+                foreach (XElement keyword in keywordBag.Elements(Rdf.Li))
                 {
                     if (tags.Contains(keyword.Value))
                     {
-                        keyword.Remove();
-                        IsDirty = true;
-                        Console.WriteLine($"Removed tag '{keyword.Value}' from {file}");
+                        tagsRemoved.Add(keyword.Value);
+                        elementsToRemove.Add(keyword);
                     }
+                }
+
+                if (elementsToRemove.Count > 0)
+                {
+                    if (elementsToRemove.Count == keywordBag.Elements(Rdf.Li).Count())
+                    {
+                        item.Remove();
+                    }
+                    else
+                    {
+                        elementsToRemove.Remove();
+                    }
+
+                    IsDirty = true;
+                    Console.WriteLine($"Removed tags from {file}: {string.Join(", ", tagsRemoved)}");
                 }
             }
         }
