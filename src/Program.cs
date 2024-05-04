@@ -132,7 +132,7 @@ class Program
 
         foreach (string file in Glob.ExpandNames(include))
         {
-            if (AbletonMetadata.IsMetadata(file) || Directory.Exists(file))
+            if (AbletonMetadata.IsMetadata(file) || !AbletonMetadata.IsSupportedSampleFormat(file) || Directory.Exists(file))
             {
                 continue;
             }

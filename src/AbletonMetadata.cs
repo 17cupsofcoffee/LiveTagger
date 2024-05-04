@@ -6,6 +6,14 @@ namespace LiveTagger;
 public static class AbletonMetadata
 {
     /// <summary>
+    /// The list of supported file extensions.
+    /// See https://help.ableton.com/hc/en-us/articles/211427589-Supported-Audio-File-Formats.
+    /// </summary>
+    private static List<string> supportedExtensions = new List<string>() {
+        ".wav", ".aiff", ".flac", ".ogg", ".mp3", ".mp4", ".m4a"
+    };
+
+    /// <summary>
     /// Returns whether or not a path represents some kind of Ableton metadata.
     /// 
     /// This is not comprehensive - it's mainly just used to exclude files from
@@ -26,5 +34,15 @@ public static class AbletonMetadata
     public static string GetXmpFilePath(string folder)
     {
         return Path.Join(folder, "Ableton Folder Info/dc66a3fa-0fe1-5352-91cf-3ec237e9ee90.xmp");
+    }
+
+    /// <summary>
+    /// Checks if the specified filename has a file extension that Live supports.
+    /// </summary>
+    /// <param name="filename">The filename to check.</param>
+    /// <returns>Whether or not the file is supported by Live.</returns>
+    public static bool IsSupportedSampleFormat(string filename)
+    {
+        return supportedExtensions.Contains(Path.GetExtension(filename));
     }
 }
