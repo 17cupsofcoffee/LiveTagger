@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using Ganss.IO;
 
 namespace LiveTagger;
 
@@ -12,32 +13,28 @@ class Program
         rootCommand.AddGlobalOption(commitOption);
 
         var tagsArg = new Argument<List<string>>("tags", "The tags to apply to the matched files.");
-        var dirOption = new Option<string>(["--dir", "-d"], () => ".", "The directory to process.");
-        var recursiveOption = new Option<bool>(["--recursive", "-r"], () => false, "Process files that are in subfolders.");
+        var includeOption = new Option<string>(["--include", "-i"], () => "*", "A glob pattern specifying which files should be processed.");
 
         var addTagCommand = new Command("add", "Adds tags to a set of files.");
         addTagCommand.AddArgument(tagsArg);
-        addTagCommand.AddOption(dirOption);
-        addTagCommand.AddOption(recursiveOption);
+        addTagCommand.AddOption(includeOption);
 
-        addTagCommand.SetHandler(addTags, dirOption, tagsArg, recursiveOption, commitOption);
+        addTagCommand.SetHandler(addTags, includeOption, tagsArg, commitOption);
 
         rootCommand.AddCommand(addTagCommand);
 
         var removeTagCommand = new Command("remove", "Removes tags from a set of files.");
         removeTagCommand.AddArgument(tagsArg);
-        removeTagCommand.AddOption(dirOption);
-        removeTagCommand.AddOption(recursiveOption);
+        removeTagCommand.AddOption(includeOption);
 
-        removeTagCommand.SetHandler(removeTags, dirOption, tagsArg, recursiveOption, commitOption);
+        removeTagCommand.SetHandler(removeTags, includeOption, tagsArg, commitOption);
 
         rootCommand.AddCommand(removeTagCommand);
 
         var removeAllTagsCommand = new Command("remove-all", "Removes all tags from a set of files.");
-        removeAllTagsCommand.AddOption(dirOption);
-        removeAllTagsCommand.AddOption(recursiveOption);
+        removeAllTagsCommand.AddOption(includeOption);
 
-        removeAllTagsCommand.SetHandler(removeAllTags, dirOption, recursiveOption, commitOption);
+        removeAllTagsCommand.SetHandler(removeAllTags, includeOption, commitOption);
 
         rootCommand.AddCommand(removeAllTagsCommand);
 
@@ -47,49 +44,45 @@ class Program
     /// <summary>
     /// Adds the specified tags to all files under the given parent directory. 
     /// </summary>
-    /// <param name="dir">The directory to process.</param>
+    /// <param name="include">A glob pattern specifying which files should be processed.</param>
     /// <param name="tags">The tags to add.</param>
-    /// <param name="recursive">Whether to search recursively.</param>
     /// <param name="commit">Whether changes should be saved.</param>
-    private static void addTags(string dir, List<string> tags, bool recursive, bool commit)
+    private static void addTags(string include, List<string> tags, bool commit)
     {
-        processXmp(dir, recursive, commit, (xmp, files) => xmp.AddTags(files, tags));
+        processXmp(include, commit, (xmp, files) => xmp.AddTags(files, tags));
     }
 
     /// <summary>
     /// Removes the specified tags from all files under the given parent directory. 
     /// </summary>
-    /// <param name="dir">The directory to process.</param>
+    /// <param name="include">A glob pattern specifying which files should be processed.</param>
     /// <param name="tags">The tags to remove.</param>
-    /// <param name="recursive">Whether to search recursively.</param>
     /// <param name="commit">Whether changes should be saved.</param>
-    private static void removeTags(string dir, List<string> tags, bool recursive, bool commit)
+    private static void removeTags(string include, List<string> tags, bool commit)
     {
-        processXmp(dir, recursive, commit, (xmp, files) => xmp.RemoveTags(files, tags));
+        processXmp(include, commit, (xmp, files) => xmp.RemoveTags(files, tags));
     }
 
     /// <summary>
     /// Removes all tags from all files under the given parent directory. 
     /// </summary>
-    /// <param name="dir">The directory to process.</param>
+    /// <param name="include">A glob pattern specifying which files should be processed.</param>
     /// <param name="tags">The tags to remove.</param>
-    /// <param name="recursive">Whether to search recursively.</param>
     /// <param name="commit">Whether changes should be saved.</param>
-    private static void removeAllTags(string dir, bool recursive, bool commit)
+    private static void removeAllTags(string include, bool commit)
     {
-        processXmp(dir, recursive, commit, (xmp, files) => xmp.RemoveTags(files));
+        processXmp(include, commit, (xmp, files) => xmp.RemoveTags(files));
     }
 
     /// <summary>
     /// Run an action on the XMP files for a given directory.
     /// </summary>
-    /// <param name="dir">The directory to process.</param>
-    /// <param name="recursive">Whether to search recursively.</param>
+    /// <param name="include">A glob pattern specifying which files should be processed.</param>
     /// <param name="commit">Whether changes should be saved.</param>
     /// <param name="action">The action to run.</param>
-    private static void processXmp(string dir, bool recursive, bool commit, Action<Xmp, List<string>> action)
+    private static void processXmp(string include, bool commit, Action<Xmp, List<string>> action)
     {
-        var folders = searchForFiles(dir, recursive);
+        var folders = searchForFiles(include);
 
         foreach (var (folder, files) in folders)
         {
@@ -131,19 +124,15 @@ class Program
     /// <summary>
     /// Searches for files to process.
     /// </summary>
-    /// <param name="path">The path to search.</param>
-    /// <param name="recursive">Whether to search recursively.</param>
+    /// <param name="include">A glob pattern specifying which files should be processed.</param>
     /// <returns>A mapping of directories to individual files.</returns>
-    private static Dictionary<string, List<string>> searchForFiles(string path, bool recursive)
+    private static Dictionary<string, List<string>> searchForFiles(string include)
     {
         var folders = new Dictionary<string, List<string>>();
-        var searchOption = recursive
-            ? SearchOption.AllDirectories
-            : SearchOption.TopDirectoryOnly;
 
-        foreach (string file in Directory.EnumerateFiles(path, "*", searchOption))
+        foreach (string file in Glob.ExpandNames(include))
         {
-            if (AbletonMetadata.IsMetadata(file))
+            if (AbletonMetadata.IsMetadata(file) || Directory.Exists(file))
             {
                 continue;
             }

@@ -21,11 +21,12 @@ livetagger add "Drums|Hihat" "Drums|HiHat|Closed" --commit
 
 This command has various options you can use to tweak the behaviour:
 
+* `--include` (or `-i`) allows you to specify which files will be processed, using a [glob pattern](https://www.digitalocean.com/community/tools/glob). Some fun ways to use this:
+    * To process nested folders, pass `--include "**/*"`.
+    * To process files containing the word 'Kick', pass `--include "*Kick*"`.
 * `--commit` (or `-c`) makes the command save its changes.
     * Without this, the command will just log what files would be impacted.
     * **I strongly suggest running without `--commit` before making any big changes, to make sure the command is going to do what you're expecting!**
-* `--dir /path/` (or `-d /path/`) specifies which directory to process.
-* `--recursive` (or `-r`) will make the command process subfolders as well as the top level directory.
 
 There are also several other commands available:
 
