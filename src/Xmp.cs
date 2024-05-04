@@ -118,9 +118,9 @@ public class Xmp
     }
 
     /// <summary>
-    /// Untag a list of files.
+    /// Remove a specific set of tags from a list of files.
     /// </summary>
-    /// <param name="files">The files to tag.</param>
+    /// <param name="files">The files to untag.</param>
     /// <param name="tags">The tags to remove.</param>
     public void RemoveTags(List<string> files, List<string> tags)
     {
@@ -136,9 +136,31 @@ public class Xmp
                 {
                     if (tags.Contains(keyword.Value))
                     {
+                        keyword.Remove();
                         Console.WriteLine($"Removed tag '{keyword.Value}' from {file}");
                     }
                 }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Remove all tags from a list of files.
+    /// </summary>
+    /// <param name="files">The files to untag.</param>
+    public void RemoveTags(List<string> files)
+    {
+        var itemsBag = xml.Descendants(Ableton.Items).First().Element(Rdf.Bag);
+
+        foreach (string file in files)
+        {
+            var item = itemsBag.Elements(Rdf.Li).FirstOrDefault(e => e.Element(Ableton.FilePath).Value == file);
+
+            if (item != null)
+            {
+                item.Remove();
+
+                Console.WriteLine($"Removed all tags from {file}");
             }
         }
     }

@@ -30,6 +30,13 @@ class Program
 
         rootCommand.AddCommand(removeTagCommand);
 
+        var removeAllTagsCommand = new Command("remove-all", "Removes all tags from the specified files.");
+        removeAllTagsCommand.AddOption(filesOption);
+
+        removeAllTagsCommand.SetHandler(removeAllTags, filesOption, commitOption);
+
+        rootCommand.AddCommand(removeAllTagsCommand);
+
         rootCommand.Invoke(args);
     }
 
@@ -53,6 +60,17 @@ class Program
     private static void removeTags(string path, List<string> tags, bool commit)
     {
         processXmp(path, commit, (xmp, files) => xmp.RemoveTags(files, tags));
+    }
+
+    /// <summary>
+    /// Removes all tags from all files under the given parent directory. 
+    /// </summary>
+    /// <param name="path">The path to process.</param>
+    /// <param name="tags">The tags to remove.</param>
+    /// <param name="commit">Whether changes should be saved.</param>
+    private static void removeAllTags(string path, bool commit)
+    {
+        processXmp(path, commit, (xmp, files) => xmp.RemoveTags(files));
     }
 
     /// <summary>
