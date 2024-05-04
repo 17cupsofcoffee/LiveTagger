@@ -116,4 +116,30 @@ public class Xmp
             }
         }
     }
+
+    /// <summary>
+    /// Untag a list of files.
+    /// </summary>
+    /// <param name="files">The files to tag.</param>
+    /// <param name="tags">The tags to remove.</param>
+    public void RemoveTags(List<string> files, List<string> tags)
+    {
+        var itemsBag = xml.Descendants(Ableton.Items).First().Element(Rdf.Bag);
+
+        foreach (string file in files)
+        {
+            var item = itemsBag.Elements(Rdf.Li).FirstOrDefault(e => e.Element(Ableton.FilePath).Value == file);
+
+            if (item != null)
+            {
+                foreach (XElement keyword in item.Element(Ableton.Keywords).Element(Rdf.Bag).Elements(Rdf.Li))
+                {
+                    if (tags.Contains(keyword.Value))
+                    {
+                        Console.WriteLine($"Removed tag '{keyword.Value}' from {file}");
+                    }
+                }
+            }
+        }
+    }
 }

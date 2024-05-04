@@ -22,10 +22,46 @@ class Program
 
         rootCommand.AddCommand(addTagCommand);
 
+        var removeTagCommand = new Command("remove", "Removes tags from the specified files.");
+        removeTagCommand.AddOption(filesOption);
+        removeTagCommand.AddOption(tagsOption);
+
+        removeTagCommand.SetHandler(removeTags, filesOption, tagsOption, commitOption);
+
+        rootCommand.AddCommand(removeTagCommand);
+
         rootCommand.Invoke(args);
     }
 
+    /// <summary>
+    /// Adds the specified tags to all files under the given parent directory. 
+    /// </summary>
+    /// <param name="path">The path to process.</param>
+    /// <param name="tags">The tags to add.</param>
+    /// <param name="commit">Whether changes should be saved.</param>
     private static void addTags(string path, List<string> tags, bool commit)
+    {
+        processXmp(path, commit, (xmp, files) => xmp.AddTags(files, tags));
+    }
+
+    /// <summary>
+    /// Removes the specified tags from all files under the given parent directory. 
+    /// </summary>
+    /// <param name="path">The path to process.</param>
+    /// <param name="tags">The tags to remove.</param>
+    /// <param name="commit">Whether changes should be saved.</param>
+    private static void removeTags(string path, List<string> tags, bool commit)
+    {
+        processXmp(path, commit, (xmp, files) => xmp.RemoveTags(files, tags));
+    }
+
+    /// <summary>
+    /// Run an action on the XMP files for a given directory.
+    /// </summary>
+    /// <param name="path">The path to process.</param>
+    /// <param name="commit">Whether changes should be saved.</param>
+    /// <param name="action">The action to run.</param>
+    private static void processXmp(string path, bool commit, Action<Xmp, List<string>> action)
     {
         var folders = searchForFiles(path);
 
@@ -45,7 +81,7 @@ class Program
                 xmp = new Xmp();
             }
 
-            xmp.AddTags(files, tags);
+            action(xmp, files);
 
             if (commit)
             {
@@ -64,7 +100,6 @@ class Program
             Console.WriteLine("Re-run with --commit to apply the above changes.");
         }
     }
-
 
     /// <summary>
     /// Searches for files to process.
@@ -97,4 +132,5 @@ class Program
 
         return folders;
     }
+
 }
