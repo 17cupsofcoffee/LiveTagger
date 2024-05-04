@@ -8,6 +8,7 @@
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <PublishTrimmed>true</PublishTrimmed>
+    <AssemblyName>livetagger</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
