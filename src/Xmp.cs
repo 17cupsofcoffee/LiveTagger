@@ -65,9 +65,14 @@ public class Xmp
     /// <param name="path">The path to save the file to.</param>
     public void Save(string path)
     {
+
         if (Path.Exists(path))
         {
             File.Copy(path, path + ".bak", true);
+        }
+        else
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
         }
 
         xml.Save(path);
