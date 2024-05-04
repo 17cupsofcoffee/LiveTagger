@@ -6,3 +6,41 @@ LiveTagger is a utility which allows you to batch tag files from the command lin
 
 > [!CAUTION]
 > This software is not endorsed or supported by Ableton. Use at your own risk!
+
+## Installing
+
+TODO - for now you can compile from source.
+
+## Usage
+
+Adding some tags to the files in the current folder is as simple as:
+
+```bash
+livetagger add "Drums|Hihat" "Drums|HiHat|Closed" --commit
+```
+
+This command has various options you can use to tweak the behaviour:
+
+* `--commit` (or `-c`) makes the command save its changes.
+    * Without this, the command will just log what files would be impacted.
+    * **I strongly suggest running without `--commit` before making any big changes, to make sure the command is going to do what you're expecting!**
+* `--dir /path/` (or `-d /path/`) specifies which directory to process.
+* `--recursive` (or `-r`) will make the command process subfolders as well as the top level directory.
+
+There are also several other commands available:
+
+* `livetagger remove` removes certain tags from the specified files.
+* `livetagger remove-all` removes *all* tags from the specified files.
+
+For more detailed info on the options available, run `livetagger --help`.
+
+### Tag Naming
+
+Live stores its tags in the format `Category|Tag|Sub Tag`, with the names matching what is displayed in the 'Edit' panel of Live's browser (including spaces).
+
+If you specify a category/tag/subtag that does not exist, Live will create it automatically. Watch out for typos!
+
+## Notes
+
+* This tool works by manually modifying the XMP metadata files that Live creates. If Ableton change the format of those files, this tool will probably break!
+* Whenever LiveTagger makes a change to the metadata, it will write a backup first. If you need to revert the changes, go to the `Ableton Folder Info` subfolder of the folder you ran the tool on, and replace the `.xmp` file with the backup. Later versions may add commands for this. 
