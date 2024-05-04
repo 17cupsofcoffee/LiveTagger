@@ -93,28 +93,29 @@ class Program
 
         foreach (var (folder, files) in folders)
         {
-            var xmpFilePath = AbletonMetadata.GetXmpFilePath(folder);
-            Xmp xmp;
+            Console.WriteLine($"Processing {folder}.");
 
-            if (Path.Exists(xmpFilePath))
-            {
-                Console.WriteLine($"=== Updating existing metadata for {folder} ===\n");
-                xmp = Xmp.FromFile(xmpFilePath);
-            }
-            else
-            {
-                Console.WriteLine($"=== Creating new metadata for {folder} ===\n");
-                xmp = new Xmp();
-            }
+            var xmpFilePath = AbletonMetadata.GetXmpFilePath(folder);
+
+            Xmp xmp = Path.Exists(xmpFilePath)
+                ? Xmp.FromFile(xmpFilePath)
+                : new Xmp();
 
             action(xmp, files);
 
-            if (commit)
+            if (xmp.IsDirty)
             {
-                xmp.Save(xmpFilePath);
-            }
+                if (commit)
+                {
+                    xmp.Save(xmpFilePath);
+                }
 
-            Console.WriteLine();
+                Console.WriteLine($"Metadata updated for {folder}.");
+            }
+            else
+            {
+                Console.WriteLine($"No changes required for {folder}.");
+            }
         }
 
         if (commit)

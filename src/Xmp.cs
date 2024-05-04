@@ -24,6 +24,11 @@ public class Xmp
     """;
 
     /// <summary>
+    /// Whether any changes have been made to the document since the last save.
+    /// </summary>
+    public bool IsDirty { get; private set; } = false;
+
+    /// <summary>
     /// The in-memory XML document.
     /// </summary>
     private XElement xml;
@@ -54,6 +59,7 @@ public class Xmp
 
     /// <summary>
     /// Saves the XMP document to the filesystem, including any changes.
+    /// If the file hasn't actually been changed, this will have no effect.
     /// If the file already exists, a backup will be made.
     /// </summary>
     /// <param name="path">The path to save the file to.</param>
@@ -65,6 +71,8 @@ public class Xmp
         }
 
         xml.Save(path);
+
+        IsDirty = false;
     }
 
     /// <summary>
@@ -90,7 +98,7 @@ public class Xmp
                     if (!keywordBag.Elements(Rdf.Li).Any(e => e.Value == tag))
                     {
                         keywordBag.Add(new XElement(Rdf.Li, tag));
-
+                        IsDirty = true;
                         Console.WriteLine($"Added tag '{tag}' to {file}");
                     }
                 }
@@ -110,7 +118,7 @@ public class Xmp
                     );
 
                     itemsBag.Add(newItem);
-
+                    IsDirty = true;
                     Console.WriteLine($"Added tag '{tag}' to {file}");
                 }
             }
@@ -137,6 +145,7 @@ public class Xmp
                     if (tags.Contains(keyword.Value))
                     {
                         keyword.Remove();
+                        IsDirty = true;
                         Console.WriteLine($"Removed tag '{keyword.Value}' from {file}");
                     }
                 }
@@ -159,7 +168,7 @@ public class Xmp
             if (item != null)
             {
                 item.Remove();
-
+                IsDirty = true;
                 Console.WriteLine($"Removed all tags from {file}");
             }
         }
