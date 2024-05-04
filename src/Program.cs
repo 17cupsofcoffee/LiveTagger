@@ -11,21 +11,21 @@ class Program
         var rootCommand = new RootCommand("LiveTagger");
         rootCommand.AddGlobalOption(commitOption);
 
-        var tagOption = new Option<string>("--tag", "The tag to apply to the matched files.") { IsRequired = true };
+        var tagsOption = new Option<List<string>>("--tag", "The tag to apply to the matched files. This option can be repeated to add multiple tags at once.") { IsRequired = true };
         var filesOption = new Option<string>("--files", "The files to tag.") { IsRequired = true };
 
         var addTagCommand = new Command("add", "Adds tags to the specified files.");
         addTagCommand.AddOption(filesOption);
-        addTagCommand.AddOption(tagOption);
+        addTagCommand.AddOption(tagsOption);
 
-        addTagCommand.SetHandler(addTag, tagOption, filesOption, commitOption);
+        addTagCommand.SetHandler(addTags, filesOption, tagsOption, commitOption);
 
         rootCommand.AddCommand(addTagCommand);
 
         rootCommand.Invoke(args);
     }
 
-    private static void addTag(string tag, string path, bool commit)
+    private static void addTags(string path, List<string> tags, bool commit)
     {
         var folders = searchForFiles(path);
 
@@ -45,7 +45,7 @@ class Program
                 xmp = new Xmp();
             }
 
-            xmp.AddTag(files, tag);
+            xmp.AddTags(files, tags);
 
             if (commit)
             {

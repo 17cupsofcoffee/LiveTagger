@@ -71,8 +71,8 @@ public class Xmp
     /// Tag a list of files.
     /// </summary>
     /// <param name="files">The files to tag.</param>
-    /// <param name="tag">The tag to apply.</param>
-    public void AddTag(List<string> files, string tag)
+    /// <param name="tags">The tags to apply.</param>
+    public void AddTags(List<string> files, List<string> tags)
     {
         var itemsBag = xml.Descendants(Ableton.Items).First().Element(Rdf.Bag);
 
@@ -85,28 +85,34 @@ public class Xmp
                 // Add keyword to existing items
                 var keywordBag = existingItem.Element(Ableton.Keywords).Element(Rdf.Bag);
 
-                if (!keywordBag.Elements(Rdf.Li).Any(e => e.Value == tag))
+                foreach (string tag in tags)
                 {
-                    keywordBag.Add(new XElement(Rdf.Li, tag));
+                    if (!keywordBag.Elements(Rdf.Li).Any(e => e.Value == tag))
+                    {
+                        keywordBag.Add(new XElement(Rdf.Li, tag));
 
-                    Console.WriteLine($"Added tag '{tag}' to {file}");
+                        Console.WriteLine($"Added tag '{tag}' to {file}");
+                    }
                 }
             }
             else
             {
                 // Create new item
-                var newItem = new XElement(Rdf.Li, new XAttribute(Rdf.ParseType, "Resource"),
-                    new XElement(Ableton.FilePath, file),
-                    new XElement(Ableton.Keywords,
-                        new XElement(Rdf.Bag,
-                            new XElement(Rdf.Li, tag)
+                foreach (string tag in tags)
+                {
+                    var newItem = new XElement(Rdf.Li, new XAttribute(Rdf.ParseType, "Resource"),
+                        new XElement(Ableton.FilePath, file),
+                        new XElement(Ableton.Keywords,
+                            new XElement(Rdf.Bag,
+                                new XElement(Rdf.Li, tag)
+                            )
                         )
-                    )
-                );
+                    );
 
-                itemsBag.Add(newItem);
+                    itemsBag.Add(newItem);
 
-                Console.WriteLine($"Added tag '{tag}' to {file}");
+                    Console.WriteLine($"Added tag '{tag}' to {file}");
+                }
             }
         }
     }
