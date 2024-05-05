@@ -22,14 +22,13 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-    - name: Build
       run: |
+        dotnet build --no-restore
         dotnet publish src -r win-x64
         dotnet publish src -r osx-x64
         dotnet publish src -r osx-arm64
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
     - name: Zip artifacts
       run: |
         7z a "livetagger-win-x64.zip" "./src/bin/Release/net8.0/win-x64/publish/*"
