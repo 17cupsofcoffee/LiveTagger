@@ -31,7 +31,7 @@ public class Xmp
     /// <summary>
     /// The in-memory XML document.
     /// </summary>
-    private XElement xml;
+    public XElement Xml { get; private set; }
 
     /// <summary>
     /// Creates a new XMP document.
@@ -39,7 +39,7 @@ public class Xmp
     /// <param name="xml">The XML to populate the document with.</param>
     private Xmp(XElement xml)
     {
-        this.xml = xml;
+        Xml = xml;
     }
 
     /// <summary>
@@ -65,7 +65,6 @@ public class Xmp
     /// <param name="path">The path to save the file to.</param>
     public void Save(string path)
     {
-
         if (Path.Exists(path))
         {
             File.Copy(path, path + ".bak", true);
@@ -75,10 +74,11 @@ public class Xmp
             Directory.CreateDirectory(Path.GetDirectoryName(path));
         }
 
-        xml.Save(path);
+        Xml.Save(path);
 
         IsDirty = false;
     }
+
 
     /// <summary>
     /// Tag a list of files.
@@ -87,7 +87,7 @@ public class Xmp
     /// <param name="tags">The tags to apply.</param>
     public void AddTags(List<string> files, List<string> tags)
     {
-        var itemsBag = xml.Descendants(Ableton.Items).First().Element(Rdf.Bag);
+        var itemsBag = Xml.Descendants(Ableton.Items).First().Element(Rdf.Bag);
 
         foreach (string file in files)
         {
@@ -102,7 +102,6 @@ public class Xmp
 
                 foreach (string tag in tags)
                 {
-
                     if (!keywordBag.Elements(Rdf.Li).Any(e => e.Value == tag))
                     {
                         keywordBag.Add(new XElement(Rdf.Li, tag));
@@ -132,7 +131,6 @@ public class Xmp
             {
                 Console.WriteLine($"Added tags to {file}: {string.Join(", ", tagsAdded)}");
             }
-
         }
     }
 
@@ -143,7 +141,7 @@ public class Xmp
     /// <param name="tags">The tags to remove.</param>
     public void RemoveTags(List<string> files, List<string> tags)
     {
-        var itemsBag = xml.Descendants(Ableton.Items).First().Element(Rdf.Bag);
+        var itemsBag = Xml.Descendants(Ableton.Items).First().Element(Rdf.Bag);
 
         foreach (string file in files)
         {
@@ -189,7 +187,7 @@ public class Xmp
     /// <param name="files">The files to untag.</param>
     public void RemoveTags(List<string> files)
     {
-        var itemsBag = xml.Descendants(Ableton.Items).First().Element(Rdf.Bag);
+        var itemsBag = Xml.Descendants(Ableton.Items).First().Element(Rdf.Bag);
 
         foreach (string file in files)
         {
