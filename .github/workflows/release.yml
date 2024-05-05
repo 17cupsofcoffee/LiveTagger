@@ -4,13 +4,11 @@
 name: Release
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  release:
+    types: [published]
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,23 +17,21 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
+    - name: Publish
       run: |
-        dotnet build --no-restore
         dotnet publish src -r win-x64
         dotnet publish src -r osx-x64
         dotnet publish src -r osx-arm64
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
     - name: Zip artifacts
       run: |
-        7z a "livetagger-win-x64.zip" "./src/bin/Release/net8.0/win-x64/publish/*"
-        7z a "livetagger-osx-x64.zip" "./src/bin/Release/net8.0/osx-x64/publish/*"
-        7z a "livetagger-osx-arm64.zip" "./src/bin/Release/net8.0/osx-arm64/publish/*"
-    - uses: actions/upload-artifact@v3
-      with:
-        name: binaries
-        path: livetagger*.zip
+        tag=$(git describe --tags --abbrev=0)
 
+        7z a "livetagger-$tag-win-x64.zip" "./src/bin/Release/net8.0/win-x64/publish/*"
+        7z a "livetagger-$tag-osx-x64.zip" "./src/bin/Release/net8.0/osx-x64/publish/*"
+        7z a "livetagger-$tag-osx-arm64.zip" "./src/bin/Release/net8.0/osx-arm64/publish/*"
+    - name: Publish
+      uses: softprops/action-gh-release@v2
+      with:
+        files: "livetagger*"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
