@@ -7,17 +7,16 @@ class Program
 {
     static void Main(string[] args)
     {
-        var commitOption = new Option<bool>(["--commit", "-c"], "Saves changes to the filesystem. Run without this first, to make sure you're tagging the correct files!");
-
         var rootCommand = new RootCommand("LiveTagger");
-        rootCommand.AddGlobalOption(commitOption);
 
         var tagsArg = new Argument<List<string>>("tags", "The tags to apply to the matched files.");
         var includeOption = new Option<string>(["--include", "-i"], () => "*", "A glob pattern specifying which files should be processed.");
+        var commitOption = new Option<bool>(["--commit", "-c"], "Saves changes to the filesystem. Run without this first, to make sure you're tagging the correct files!");
 
         var addTagCommand = new Command("add", "Adds tags to a set of files.");
         addTagCommand.AddArgument(tagsArg);
         addTagCommand.AddOption(includeOption);
+        addTagCommand.AddOption(commitOption);
 
         addTagCommand.SetHandler(addTags, includeOption, tagsArg, commitOption);
 
@@ -26,6 +25,7 @@ class Program
         var removeTagCommand = new Command("remove", "Removes tags from a set of files.");
         removeTagCommand.AddArgument(tagsArg);
         removeTagCommand.AddOption(includeOption);
+        removeTagCommand.AddOption(commitOption);
 
         removeTagCommand.SetHandler(removeTags, includeOption, tagsArg, commitOption);
 
@@ -33,6 +33,7 @@ class Program
 
         var removeAllTagsCommand = new Command("remove-all", "Removes all tags from a set of files.");
         removeAllTagsCommand.AddOption(includeOption);
+        removeAllTagsCommand.AddOption(commitOption);
 
         removeAllTagsCommand.SetHandler(removeAllTags, includeOption, commitOption);
 
