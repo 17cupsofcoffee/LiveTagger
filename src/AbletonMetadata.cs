@@ -10,7 +10,7 @@ public static class AbletonMetadata
     /// See https://help.ableton.com/hc/en-us/articles/211427589-Supported-Audio-File-Formats.
     /// </summary>
     private static List<string> supportedExtensions = new List<string>() {
-        ".wav", ".aiff", ".flac", ".ogg", ".mp3", ".mp4", ".m4a"
+        ".wav", ".wave", ".aif", ".aiff", ".flac", ".ogg", ".mp3", ".mp4", ".m4a"
     };
 
     /// <summary>
@@ -23,7 +23,7 @@ public static class AbletonMetadata
     /// <returns>Whether or not the path is for metadata.</returns>
     public static bool IsMetadata(string path)
     {
-        return path.Contains("Ableton Folder Info") || Path.GetExtension(path) == ".asd";
+        return path.Contains("Ableton Folder Info") || Path.GetExtension(path).ToLower() == ".asd";
     }
 
     /// <summary>
@@ -43,6 +43,6 @@ public static class AbletonMetadata
     /// <returns>Whether or not the file is supported by Live.</returns>
     public static bool IsSupportedSampleFormat(string filename)
     {
-        return supportedExtensions.Contains(Path.GetExtension(filename));
+        return supportedExtensions.Contains(Path.GetExtension(filename).ToLower());
     }
 }

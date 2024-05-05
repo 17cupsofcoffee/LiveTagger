@@ -5,6 +5,7 @@ public class AbletonMetadataTests
     [Theory]
     [InlineData("C:/foo/Ableton Folder Info/file.txt", true)]
     [InlineData("C:/foo/metadata.asd", true)]
+    [InlineData("C:/foo/metadata.ASD", true)]
     [InlineData("C:/foo/sound.wav", false)]
     public void ShouldDetectMetadata(string path, bool isValid)
     {
@@ -21,12 +22,15 @@ public class AbletonMetadataTests
 
     [Theory]
     [InlineData("sound.wav", true)]
+    [InlineData("sound.wave", true)]
+    [InlineData("sound.aif", true)]
     [InlineData("sound.aiff", true)]
     [InlineData("sound.flac", true)]
     [InlineData("sound.ogg", true)]
     [InlineData("sound.mp3", true)]
     [InlineData("sound.mp4", true)]
     [InlineData("sound.m4a", true)]
+    [InlineData("sound.WAV", true)]
     [InlineData("sound.exe", false)]
     public void ShouldDetectSampleFiles(string filename, bool isValid)
     {
