@@ -133,8 +133,14 @@ class Program
 
         foreach (string file in Glob.ExpandNames(include))
         {
-            if (AbletonMetadata.IsMetadata(file) || !AbletonMetadata.IsSupportedSampleFormat(file) || Directory.Exists(file))
+            if (AbletonMetadata.IsMetadata(file) || Directory.Exists(file))
             {
+                continue;
+            }
+
+            if (!AbletonMetadata.IsSupportedSampleFormat(file))
+            {
+                Console.WriteLine($"Skipping {file} as it doesn't look like an audio file");
                 continue;
             }
 
