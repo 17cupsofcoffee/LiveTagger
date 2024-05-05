@@ -11,7 +11,9 @@ LiveTagger is a utility which allows you to batch edit your tags from the comman
 
 ## Installing
 
-TODO - for now you can compile from source.
+To download LiveTagger, go to the [releases page](https://github.com/17cupsofcoffee/LiveTagger/releases) and download the .zip file for your platform. Extract this into a location that is on your system `PATH`.
+
+Alternatively, if you want to build from source, clone this repo and run `dotnet publish src`.
 
 ## Usage
 
