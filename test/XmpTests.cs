@@ -51,6 +51,19 @@ public class XmpTests
     }
 
     [Fact]
+    public void ShouldMarkDirtyAfterAddTags()
+    {
+        var xmp = new Xmp();
+
+        xmp.AddTags(
+            new List<string>() { "bd1.wav" },
+            new List<string>() { "Drums|Kick" }
+        );
+
+        Assert.True(xmp.IsDirty);
+    }
+
+    [Fact]
     public void ShouldRemoveTags()
     {
         var xmp = new Xmp();
@@ -83,6 +96,27 @@ public class XmpTests
     }
 
     [Fact]
+    public void ShouldMarkDirtyAfterRemoveTags()
+    {
+        // TODO: This test isn't great, as it's not clear whether AddTags or RemoveTags
+        // is triggering the flag.
+
+        var xmp = new Xmp();
+
+        xmp.AddTags(
+            new List<string>() { "bd1.wav" },
+            new List<string>() { "Drums|Kick" }
+        );
+
+        xmp.RemoveTags(
+            new List<string>() { "bd1.wav" },
+            new List<string>() { "Drums|Kick" }
+        );
+
+        Assert.True(xmp.IsDirty);
+    }
+
+    [Fact]
     public void ShouldRemoveAllTags()
     {
         var xmp = new Xmp();
@@ -102,6 +136,26 @@ public class XmpTests
         // Removing all tags from a file should remove the entire item.
         Assert.Single(bd);
         Assert.Empty(ch);
+    }
+
+    [Fact]
+    public void ShouldMarkDirtyAfterRemoveAllTags()
+    {
+        // TODO: This test isn't great, as it's not clear whether AddTags or RemoveTags
+        // is triggering the flag.
+
+        var xmp = new Xmp();
+
+        xmp.AddTags(
+            new List<string>() { "bd1.wav" },
+            new List<string>() { "Drums|Kick" }
+        );
+
+        xmp.RemoveTags(
+            new List<string>() { "bd1.wav" }
+        );
+
+        Assert.True(xmp.IsDirty);
     }
 
     private IEnumerable<XElement> getItem(XElement xml, string file)
