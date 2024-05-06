@@ -86,13 +86,13 @@ public class XmpTests
         var bd = getItem(xmp.Xml, "bd.wav");
         var ch = getItem(xmp.Xml, "ch.wav");
 
-        // Removing all tags from a file should remove the entire item.
         Assert.Single(bd);
-        Assert.Empty(ch);
+        Assert.Single(ch);
 
         var bdTags = getTags(bd.First());
 
         Assert.Contains("Drums|Kick", bdTags);
+        Assert.Null(ch.First().Element(Ableton.Keywords));
     }
 
     [Fact]
@@ -133,9 +133,13 @@ public class XmpTests
         var bd = getItem(xmp.Xml, "bd.wav");
         var ch = getItem(xmp.Xml, "ch.wav");
 
-        // Removing all tags from a file should remove the entire item.
         Assert.Single(bd);
-        Assert.Empty(ch);
+        Assert.Single(ch);
+
+        var bdTags = getTags(bd.First());
+
+        Assert.Contains("Drums|Kick", bdTags);
+        Assert.Null(ch.First().Element(Ableton.Keywords));
     }
 
     [Fact]
