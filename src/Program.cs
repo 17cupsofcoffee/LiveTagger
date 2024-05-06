@@ -18,7 +18,7 @@ class Program
         addTagCommand.AddOption(includeOption);
         addTagCommand.AddOption(commitOption);
 
-        addTagCommand.SetHandler(addTags, includeOption, tagsArg, commitOption);
+        addTagCommand.SetHandler(AddTags, includeOption, tagsArg, commitOption);
 
         rootCommand.AddCommand(addTagCommand);
 
@@ -27,7 +27,7 @@ class Program
         removeTagCommand.AddOption(includeOption);
         removeTagCommand.AddOption(commitOption);
 
-        removeTagCommand.SetHandler(removeTags, includeOption, tagsArg, commitOption);
+        removeTagCommand.SetHandler(RemoveTags, includeOption, tagsArg, commitOption);
 
         rootCommand.AddCommand(removeTagCommand);
 
@@ -35,7 +35,7 @@ class Program
         removeAllTagsCommand.AddOption(includeOption);
         removeAllTagsCommand.AddOption(commitOption);
 
-        removeAllTagsCommand.SetHandler(removeAllTags, includeOption, commitOption);
+        removeAllTagsCommand.SetHandler(RemoveAllTags, includeOption, commitOption);
 
         rootCommand.AddCommand(removeAllTagsCommand);
 
@@ -48,9 +48,9 @@ class Program
     /// <param name="include">A glob pattern specifying which files should be processed.</param>
     /// <param name="tags">The tags to add.</param>
     /// <param name="commit">Whether changes should be saved.</param>
-    private static void addTags(string include, List<string> tags, bool commit)
+    private static void AddTags(string include, List<string> tags, bool commit)
     {
-        processXmp(include, commit, (xmp, files) => xmp.AddTags(files, tags));
+        ProcessXmp(include, commit, (xmp, files) => xmp.AddTags(files, tags));
     }
 
     /// <summary>
@@ -59,9 +59,9 @@ class Program
     /// <param name="include">A glob pattern specifying which files should be processed.</param>
     /// <param name="tags">The tags to remove.</param>
     /// <param name="commit">Whether changes should be saved.</param>
-    private static void removeTags(string include, List<string> tags, bool commit)
+    private static void RemoveTags(string include, List<string> tags, bool commit)
     {
-        processXmp(include, commit, (xmp, files) => xmp.RemoveTags(files, tags));
+        ProcessXmp(include, commit, (xmp, files) => xmp.RemoveTags(files, tags));
     }
 
     /// <summary>
@@ -70,9 +70,9 @@ class Program
     /// <param name="include">A glob pattern specifying which files should be processed.</param>
     /// <param name="tags">The tags to remove.</param>
     /// <param name="commit">Whether changes should be saved.</param>
-    private static void removeAllTags(string include, bool commit)
+    private static void RemoveAllTags(string include, bool commit)
     {
-        processXmp(include, commit, (xmp, files) => xmp.RemoveTags(files));
+        ProcessXmp(include, commit, (xmp, files) => xmp.RemoveTags(files));
     }
 
     /// <summary>
@@ -81,9 +81,9 @@ class Program
     /// <param name="include">A glob pattern specifying which files should be processed.</param>
     /// <param name="commit">Whether changes should be saved.</param>
     /// <param name="action">The action to run.</param>
-    private static void processXmp(string include, bool commit, Action<Xmp, List<string>> action)
+    private static void ProcessXmp(string include, bool commit, Action<Xmp, List<string>> action)
     {
-        var folders = searchForFiles(include);
+        var folders = SearchForFiles(include);
 
         foreach (var (folder, files) in folders)
         {
@@ -127,7 +127,7 @@ class Program
     /// </summary>
     /// <param name="include">A glob pattern specifying which files should be processed.</param>
     /// <returns>A mapping of directories to individual files.</returns>
-    private static Dictionary<string, List<string>> searchForFiles(string include)
+    private static Dictionary<string, List<string>> SearchForFiles(string include)
     {
         var folders = new Dictionary<string, List<string>>();
 
@@ -153,7 +153,7 @@ class Program
             }
             else
             {
-                folders.Add(parent, new List<string>() { filename });
+                folders.Add(parent, [filename]);
             }
         }
 

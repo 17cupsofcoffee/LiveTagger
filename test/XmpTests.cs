@@ -1,4 +1,4 @@
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using System.Xml.XPath;
 using LiveTagger.XmlConstants;
 
@@ -12,18 +12,18 @@ public class XmpTests
         var xmp = new Xmp();
 
         xmp.AddTags(
-            new List<string>() { "bd1.wav", "bd2.wav" },
-            new List<string>() { "Drums|Kick" }
+            ["bd1.wav", "bd2.wav"],
+            ["Drums|Kick"]
         );
 
         xmp.AddTags(
-            new List<string>() { "ch.wav" },
-            new List<string>() { "Drums|Hihat", "Drums|Hihat|Closed Hihat" }
+            ["ch.wav"],
+            ["Drums|Hihat", "Drums|Hihat|Closed Hihat"]
         );
 
         xmp.AddTags(
-            new List<string>() { "bd1.wav", "bd2.wav", "ch.wav" },
-            new List<string>() { "Creator|17cupsofcoffee" }
+            ["bd1.wav", "bd2.wav", "ch.wav"],
+            ["Creator|17cupsofcoffee"]
         );
 
         var bd1 = getItem(xmp.Xml, "bd1.wav");
@@ -56,8 +56,8 @@ public class XmpTests
         var xmp = new Xmp();
 
         xmp.AddTags(
-            new List<string>() { "bd1.wav" },
-            new List<string>() { "Drums|Kick" }
+            ["bd1.wav"],
+            ["Drums|Kick"]
         );
 
         Assert.True(xmp.IsDirty);
@@ -69,18 +69,18 @@ public class XmpTests
         var xmp = new Xmp();
 
         xmp.AddTags(
-            new List<string>() { "bd.wav", "ch.wav" },
-            new List<string>() { "Drums|Kick", "Drums|Snare" }
+            ["bd.wav", "ch.wav"],
+            ["Drums|Kick", "Drums|Snare"]
         );
 
         xmp.RemoveTags(
-            new List<string>() { "bd.wav", "ch.wav" },
-            new List<string>() { "Drums|Snare" }
+            ["bd.wav", "ch.wav"],
+            ["Drums|Snare"]
         );
 
         xmp.RemoveTags(
-            new List<string>() { "ch.wav" },
-            new List<string>() { "Drums|Kick" }
+            ["ch.wav"],
+            ["Drums|Kick"]
         );
 
         var bd = getItem(xmp.Xml, "bd.wav");
@@ -104,13 +104,13 @@ public class XmpTests
         var xmp = new Xmp();
 
         xmp.AddTags(
-            new List<string>() { "bd1.wav" },
-            new List<string>() { "Drums|Kick" }
+            ["bd1.wav"],
+            ["Drums|Kick"]
         );
 
         xmp.RemoveTags(
-            new List<string>() { "bd1.wav" },
-            new List<string>() { "Drums|Kick" }
+            ["bd1.wav"],
+            ["Drums|Kick"]
         );
 
         Assert.True(xmp.IsDirty);
@@ -122,12 +122,12 @@ public class XmpTests
         var xmp = new Xmp();
 
         xmp.AddTags(
-            new List<string>() { "bd.wav", "ch.wav" },
-            new List<string>() { "Drums|Kick" }
+            ["bd.wav", "ch.wav"],
+            ["Drums|Kick"]
         );
 
         xmp.RemoveTags(
-            new List<string>() { "ch.wav" }
+            ["ch.wav"]
         );
 
         var bd = getItem(xmp.Xml, "bd.wav");
@@ -147,12 +147,12 @@ public class XmpTests
         var xmp = new Xmp();
 
         xmp.AddTags(
-            new List<string>() { "bd1.wav" },
-            new List<string>() { "Drums|Kick" }
+            ["bd1.wav"],
+            ["Drums|Kick"]
         );
 
         xmp.RemoveTags(
-            new List<string>() { "bd1.wav" }
+            ["bd1.wav"]
         );
 
         Assert.True(xmp.IsDirty);

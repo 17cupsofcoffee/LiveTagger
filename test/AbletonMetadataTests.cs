@@ -1,4 +1,4 @@
-namespace LiveTagger.Tests;
+﻿namespace LiveTagger.Tests;
 
 public class AbletonMetadataTests
 {

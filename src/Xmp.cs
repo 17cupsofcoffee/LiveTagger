@@ -1,4 +1,4 @@
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using LiveTagger.XmlConstants;
 
 namespace LiveTagger;
@@ -8,7 +8,7 @@ public class Xmp
     /// <summary>
     /// Base template for new XMP files.
     /// </summary>
-    private static string xmlTemplate = """
+    private static readonly string s_xmlTemplate = """
         <?xml version="1.0" encoding="utf-8"?>
             <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 5.6.0">
             <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -45,7 +45,7 @@ public class Xmp
     /// <summary>
     /// Creates a new XMP document, with no metadata.
     /// </summary>
-    public Xmp() : this(XElement.Parse(xmlTemplate.Trim())) { }
+    public Xmp() : this(XElement.Parse(s_xmlTemplate.Trim())) { }
 
     /// <summary>
     /// Loads an XMP document from the filesystem.

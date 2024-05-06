@@ -1,4 +1,4 @@
-namespace LiveTagger;
+﻿namespace LiveTagger;
 
 /// <summary>
 /// Helper functions for dealing with Ableton metadata files.
@@ -9,9 +9,17 @@ public static class AbletonMetadata
     /// The list of supported file extensions.
     /// See https://help.ableton.com/hc/en-us/articles/211427589-Supported-Audio-File-Formats.
     /// </summary>
-    private static List<string> supportedExtensions = new List<string>() {
-        ".wav", ".wave", ".aif", ".aiff", ".flac", ".ogg", ".mp3", ".mp4", ".m4a"
-    };
+    private static readonly List<string> s_supportedExtensions = [
+        ".wav",
+        ".wave",
+        ".aif",
+        ".aiff",
+        ".flac",
+        ".ogg",
+        ".mp3",
+        ".mp4",
+        ".m4a"
+    ];
 
     /// <summary>
     /// Returns whether or not a path represents some kind of Ableton metadata.
@@ -23,7 +31,7 @@ public static class AbletonMetadata
     /// <returns>Whether or not the path is for metadata.</returns>
     public static bool IsMetadata(string path)
     {
-        return path.Contains("Ableton Folder Info") || Path.GetExtension(path).ToLower() == ".asd";
+        return path.Contains("Ableton Folder Info") || Path.GetExtension(path).Equals(".asd", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -43,6 +51,6 @@ public static class AbletonMetadata
     /// <returns>Whether or not the file is supported by Live.</returns>
     public static bool IsSupportedSampleFormat(string filename)
     {
-        return supportedExtensions.Contains(Path.GetExtension(filename).ToLower());
+        return s_supportedExtensions.Contains(Path.GetExtension(filename).ToLower());
     }
 }
