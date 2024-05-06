@@ -59,6 +59,16 @@ public class Xmp
     public Xmp() : this(XElement.Parse(s_xmlTemplate.Trim())) { }
 
     /// <summary>
+    /// Loads an XMP document from a string.
+    /// </summary>
+    /// <param name="xml">The XML to load.</param>
+    /// <returns>The loaded XMP document.</returns>
+    public static Xmp FromString(string xml)
+    {
+        return new Xmp(XElement.Parse(xml));
+    }
+
+    /// <summary>
     /// Loads an XMP document from the filesystem.
     /// </summary>
     /// <param name="path">The path to the XMP file to load.</param>

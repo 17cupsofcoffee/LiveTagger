@@ -26,38 +26,10 @@ public class XmpTests
             ["Creator|17cupsofcoffee"]
         );
 
-        var bd1 = getItem(xmp.Xml, "bd1.wav");
-        var bd2 = getItem(xmp.Xml, "bd2.wav");
-        var ch = getItem(xmp.Xml, "ch.wav");
-
-        // We should only ever have a single item per file.
-        Assert.Single(bd1);
-        Assert.Single(bd2);
-        Assert.Single(ch);
-
-        var bd1Tags = getTags(bd1.First());
-        var bd2Tags = getTags(bd2.First());
-        var chTags = getTags(ch.First());
-
-        Assert.Contains("Drums|Kick", bd1Tags);
-        Assert.Contains("Creator|17cupsofcoffee", bd1Tags);
-
-        Assert.Contains("Drums|Kick", bd2Tags);
-        Assert.Contains("Creator|17cupsofcoffee", bd2Tags);
-
-        Assert.Contains("Drums|Hihat", chTags);
-        Assert.Contains("Drums|Hihat|Closed Hihat", chTags);
-        Assert.Contains("Creator|17cupsofcoffee", chTags);
-    }
-
-    [Fact]
-    public void ShouldMarkDirtyAfterAddTags()
-    {
-        var xmp = new Xmp();
-
-        xmp.AddTags(
-            ["bd1.wav"],
-            ["Drums|Kick"]
+        Assert.Equal(
+            XElement.Parse(TestUtils.ReadFileAsString("TestData/WithTagsAdded.xml")),
+            xmp.Xml,
+            XNode.EqualityComparer
         );
 
         Assert.True(xmp.IsDirty);
@@ -66,51 +38,22 @@ public class XmpTests
     [Fact]
     public void ShouldRemoveTags()
     {
-        var xmp = new Xmp();
-
-        xmp.AddTags(
-            ["bd.wav", "ch.wav"],
-            ["Drums|Kick", "Drums|Snare"]
-        );
+        var xmp = Xmp.FromString(TestUtils.ReadFileAsString("TestData/WithTagsAdded.xml"));
 
         xmp.RemoveTags(
-            ["bd.wav", "ch.wav"],
-            ["Drums|Snare"]
+            ["bd1.wav", "bd2.wav", "ch.wav"],
+            ["Creator|17cupsofcoffee"]
         );
 
         xmp.RemoveTags(
             ["ch.wav"],
-            ["Drums|Kick"]
+            ["Drums|Hihat", "Drums|Hihat|Closed Hihat"]
         );
 
-        var bd = getItem(xmp.Xml, "bd.wav");
-        var ch = getItem(xmp.Xml, "ch.wav");
-
-        Assert.Single(bd);
-        Assert.Single(ch);
-
-        var bdTags = getTags(bd.First());
-
-        Assert.Contains("Drums|Kick", bdTags);
-        Assert.Null(ch.First().Element(Ableton.Keywords));
-    }
-
-    [Fact]
-    public void ShouldMarkDirtyAfterRemoveTags()
-    {
-        // TODO: This test isn't great, as it's not clear whether AddTags or RemoveTags
-        // is triggering the flag.
-
-        var xmp = new Xmp();
-
-        xmp.AddTags(
-            ["bd1.wav"],
-            ["Drums|Kick"]
-        );
-
-        xmp.RemoveTags(
-            ["bd1.wav"],
-            ["Drums|Kick"]
+        Assert.Equal(
+            XElement.Parse(TestUtils.ReadFileAsString("TestData/WithTagsRemoved.xml")),
+            xmp.Xml,
+            XNode.EqualityComparer
         );
 
         Assert.True(xmp.IsDirty);
@@ -119,64 +62,18 @@ public class XmpTests
     [Fact]
     public void ShouldRemoveAllTags()
     {
-        var xmp = new Xmp();
-
-        xmp.AddTags(
-            ["bd.wav", "ch.wav"],
-            ["Drums|Kick"]
-        );
+        var xmp = Xmp.FromString(TestUtils.ReadFileAsString("TestData/WithTagsAdded.xml"));
 
         xmp.RemoveTags(
             ["ch.wav"]
         );
 
-        var bd = getItem(xmp.Xml, "bd.wav");
-        var ch = getItem(xmp.Xml, "ch.wav");
-
-        Assert.Single(bd);
-        Assert.Single(ch);
-
-        var bdTags = getTags(bd.First());
-
-        Assert.Contains("Drums|Kick", bdTags);
-        Assert.Null(ch.First().Element(Ableton.Keywords));
-    }
-
-    [Fact]
-    public void ShouldMarkDirtyAfterRemoveAllTags()
-    {
-        // TODO: This test isn't great, as it's not clear whether AddTags or RemoveTags
-        // is triggering the flag.
-
-        var xmp = new Xmp();
-
-        xmp.AddTags(
-            ["bd1.wav"],
-            ["Drums|Kick"]
-        );
-
-        xmp.RemoveTags(
-            ["bd1.wav"]
+        Assert.Equal(
+            XElement.Parse(TestUtils.ReadFileAsString("TestData/WithAllTagsRemoved.xml")),
+            xmp.Xml,
+            XNode.EqualityComparer
         );
 
         Assert.True(xmp.IsDirty);
-    }
-
-    private IEnumerable<XElement> getItem(XElement xml, string file)
-    {
-        return xml.Descendants(Ableton.Items)!
-            .First()!
-            .Element(Rdf.Bag)!
-            .Elements(Rdf.Li)!
-            .Where(e => e.Element(Ableton.FilePath)!.Value == file);
-    }
-
-    private IEnumerable<string> getTags(XElement item)
-    {
-        return item
-            .Element(Ableton.Keywords)!
-            .Element(Rdf.Bag)!
-            .Elements(Rdf.Li)
-            .Select(e => e.Value);
     }
 }
