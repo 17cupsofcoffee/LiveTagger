@@ -104,7 +104,8 @@ public class Xmp
         if (existingItem != null)
         {
             // Add keyword to existing items
-            var keywordBag = existingItem.Element(Ableton.Keywords).Element(Rdf.Bag);
+            var keywords = existingItem.Element(Ableton.Keywords);
+            var keywordBag = keywords.Element(Rdf.Bag);
 
             foreach (string tag in tags)
             {
@@ -164,7 +165,8 @@ public class Xmp
 
         if (item != null)
         {
-            var keywordBag = item.Element(Ableton.Keywords).Element(Rdf.Bag);
+            var keywords = item.Element(Ableton.Keywords);
+            var keywordBag = keywords.Element(Rdf.Bag);
 
             var tagsRemoved = new List<string>();
             var elementsToRemove = new List<XElement>();
@@ -182,7 +184,7 @@ public class Xmp
             {
                 if (elementsToRemove.Count == keywordBag.Elements(Rdf.Li).Count())
                 {
-                    item.Remove();
+                    keywords.Remove();
                 }
                 else
                 {
@@ -218,7 +220,9 @@ public class Xmp
 
         if (item != null)
         {
-            item.Remove();
+            var keywords = item.Element(Ableton.Keywords);
+
+            keywords.Remove();
             IsDirty = true;
             Console.WriteLine($"Removed all tags from {file}");
         }
