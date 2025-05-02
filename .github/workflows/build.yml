@@ -14,11 +14,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - build: win-x64
+          - build: Windows (x64)
             os: windows-latest
             target: x86_64-pc-windows-msvc
-          - build: macos-x64
-            os: macos-latest
+          - build: MacOS (x64)
+            os: macos-13
             target: x86_64-apple-darwin
           - build: macos-arm
             os: macos-latest
@@ -34,3 +34,7 @@ jobs:
         target: ${{ matrix.target }}
     - run: cargo build --target ${{ matrix.target }}
     - run: cargo test --target ${{ matrix.target }}
+    - uses: actions/upload-artifact@v4
+      with:
+        name: build-${{ matrix.target }}
+        path: target/${{ matrix.target }}/debug/livetagger*
