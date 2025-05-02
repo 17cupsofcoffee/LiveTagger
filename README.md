@@ -13,7 +13,7 @@ It allows you to quickly automate tasks that would be tedious to do via Live's U
 
 To download LiveTagger, go to the [releases page](https://github.com/17cupsofcoffee/LiveTagger/releases) and download the .zip file for your platform. Extract this into a location that is on your system `PATH`.
 
-Alternatively, if you want to build from source, clone this repo and run `dotnet publish src`.
+Alternatively, if you want to build from source, clone this repo and run `cargo build`.
 
 ## Usage
 

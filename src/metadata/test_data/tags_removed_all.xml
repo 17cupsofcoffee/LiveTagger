@@ -1,0 +1,23 @@
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="XMP Core 6.0.0">
+    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+        <rdf:Description rdf:about=""
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:ablFR="https://ns.ableton.com/xmp/fs-resources/1.0/"
+                xmlns:xmp="http://ns.adobe.com/xap/1.0/">
+            <dc:format>application/vnd.ableton.folder</dc:format>
+            <ablFR:resource>folder</ablFR:resource>
+            <ablFR:items>
+                <rdf:Bag>
+                    <rdf:li rdf:parseType="Resource">
+                        <ablFR:filePath>bd1.wav</ablFR:filePath>
+                    </rdf:li>
+                    <rdf:li rdf:parseType="Resource">
+                        <ablFR:filePath>bd2.wav</ablFR:filePath>
+                    </rdf:li>
+                </rdf:Bag>
+            </ablFR:items>
+            <xmp:CreatorTool>Ableton Index 12.1</xmp:CreatorTool>
+            <xmp:CreateDate>2024-10-10T20:42:58+01:00</xmp:CreateDate>
+        </rdf:Description>
+    </rdf:RDF>
+</x:xmpmeta>
