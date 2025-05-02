@@ -11,18 +11,17 @@ on:
 
 jobs:
   build:
+    name: ${{ matrix.job.target }}
+
     strategy:
       matrix:
         include:
-          - build: Windows (x64)
+          - target: x86_64-pc-windows-msvc
             os: windows-latest
-            target: x86_64-pc-windows-msvc
-          - build: MacOS (x64)
+          - target: x86_64-apple-darwin
             os: macos-13
-            target: x86_64-apple-darwin
-          - build: macos-arm
+          - target: aarch64-apple-darwin
             os: macos-latest
-            target: aarch64-apple-darwin
         
     runs-on: ${{ matrix.os }}
 
@@ -34,7 +33,3 @@ jobs:
         target: ${{ matrix.target }}
     - run: cargo build --target ${{ matrix.target }}
     - run: cargo test --target ${{ matrix.target }}
-    - uses: actions/upload-artifact@v4
-      with:
-        name: build-${{ matrix.target }}
-        path: target/${{ matrix.target }}/debug/livetagger*
