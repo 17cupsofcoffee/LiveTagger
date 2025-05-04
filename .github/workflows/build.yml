@@ -31,5 +31,5 @@ jobs:
       with:
         toolchain: stable
         target: ${{ matrix.target }}
-    - run: cargo build --target ${{ matrix.target }}
-    - run: cargo test --target ${{ matrix.target }}
+    - run: cargo build --all --target ${{ matrix.target }}
+    - run: cargo test --all --target ${{ matrix.target }}

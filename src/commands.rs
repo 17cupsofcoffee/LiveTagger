@@ -144,3 +144,102 @@ pub fn remove_all_tags(
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn should_add_tags() -> anyhow::Result<()> {
+        let initial = include_str!("test_data/initial.xml");
+        let expected = include_str!("test_data/tags_added.xml");
+
+        let mut meta = FolderMetadata::from_xmp_str(initial)?;
+
+        let mut files = HashSet::new();
+
+        files.insert("bd1.wav".into());
+        files.insert("bd2.wav".into());
+        files.insert("bd3.wav".into());
+
+        let tags = vec!["Drums|Kick".into(), "CustomTag".into()];
+
+        add_tags(
+            &CommandArgs {
+                tags,
+                include: String::new(),
+                commit: true,
+                backup: true,
+            },
+            &mut meta,
+            files,
+        )?;
+
+        assert!(meta.is_dirty());
+        pretty_assertions::assert_eq!(meta.to_xml().unwrap(), expected.replace("\r\n", "\n"));
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_remove_tags() -> anyhow::Result<()> {
+        let initial = include_str!("test_data/initial.xml");
+        let expected = include_str!("test_data/tags_removed.xml");
+
+        let mut meta = FolderMetadata::from_xmp_str(initial)?;
+
+        let mut files = HashSet::new();
+
+        files.insert("bd1.wav".into());
+        files.insert("bd2.wav".into());
+        files.insert("bd3.wav".into());
+
+        let tags = vec!["Creator|17cupsofcoffee".into(), "NonExistentTag".into()];
+
+        remove_tags(
+            &CommandArgs {
+                tags,
+                include: String::new(),
+                commit: true,
+                backup: true,
+            },
+            &mut meta,
+            files,
+        )?;
+
+        assert!(meta.is_dirty());
+        pretty_assertions::assert_eq!(meta.to_xml().unwrap(), expected.replace("\r\n", "\n"));
+
+        Ok(())
+    }
+
+    #[test]
+    fn should_remove_all_tags() -> anyhow::Result<()> {
+        let initial = include_str!("test_data/initial.xml");
+        let expected = include_str!("test_data/tags_removed_all.xml");
+
+        let mut meta = FolderMetadata::from_xmp_str(initial)?;
+
+        let mut files = HashSet::new();
+
+        files.insert("bd1.wav".into());
+        files.insert("bd2.wav".into());
+        files.insert("bd3.wav".into());
+
+        remove_all_tags(
+            &CommandArgs {
+                tags: Vec::new(),
+                include: String::new(),
+                commit: true,
+                backup: true,
+            },
+            &mut meta,
+            files,
+        )?;
+
+        assert!(meta.is_dirty());
+        pretty_assertions::assert_eq!(meta.to_xml().unwrap(), expected.replace("\r\n", "\n"));
+
+        Ok(())
+    }
+}

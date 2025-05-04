@@ -217,7 +217,6 @@ checksum = "d750af042f7ef4f724306de029d18836c26c1765a54a6a3f094cbd23a7267ffa"
 name = "livemeta"
 version = "0.1.0"
 dependencies = [
- "pretty_assertions",
  "xmp_toolkit",
 ]
 
@@ -229,6 +228,7 @@ dependencies = [
  "clap",
  "glob",
  "livemeta",
+ "pretty_assertions",
  "tracing",
  "tracing-subscriber",
 ]
