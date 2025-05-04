@@ -1,6 +1,8 @@
+mod error;
 mod folder;
 mod sample;
 
+pub use error::*;
 pub use folder::*;
 pub use sample::*;
 

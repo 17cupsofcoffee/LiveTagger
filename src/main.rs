@@ -1,3 +1,5 @@
+mod commands;
+
 use std::collections::{HashMap, HashSet};
 use std::ffi::OsStr;
 
@@ -8,7 +10,7 @@ use anyhow::Context;
 use clap::{Args, Parser, Subcommand};
 use glob::glob;
 
-use livetagger::metadata::{self, FolderMetadata};
+use livemeta::{self, FolderMetadata};
 use tracing::info;
 
 #[derive(Parser, Debug)]
@@ -56,44 +58,24 @@ fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt().with_target(false).init();
 
     match cli.command {
-        Command::Add(args) => {
-            process_xmp(&args.include, args.commit, args.backup, |xmp, files| {
-                metadata::add_tags(xmp, files, &args.tags)?;
-
-                Ok(())
-            })?;
-        }
-
-        Command::Remove(args) => {
-            process_xmp(&args.include, args.commit, args.backup, |xmp, files| {
-                metadata::remove_tags(xmp, files, &args.tags)?;
-
-                Ok(())
-            })?;
-        }
-
-        Command::RemoveAll(args) => {
-            process_xmp(&args.include, args.commit, args.backup, |xmp, files| {
-                metadata::remove_all_tags(xmp, files)?;
-
-                Ok(())
-            })?;
-        }
+        Command::Add(args) => process_xmp(&args, commands::add_tags)?,
+        Command::Remove(args) => process_xmp(&args, commands::remove_tags)?,
+        Command::RemoveAll(args) => process_xmp(&args, commands::remove_all_tags)?,
     }
 
     Ok(())
 }
 
-fn process_xmp<F>(include: &str, commit: bool, backup: bool, mut action: F) -> anyhow::Result<()>
+fn process_xmp<F>(args: &CommandArgs, mut action: F) -> anyhow::Result<()>
 where
-    F: FnMut(&mut FolderMetadata, HashSet<String>) -> anyhow::Result<()>,
+    F: FnMut(&CommandArgs, &mut FolderMetadata, HashSet<String>) -> anyhow::Result<()>,
 {
-    let folders = search_for_files(include)?;
+    let folders = search_for_files(&args.include)?;
 
     for (folder, files) in folders {
         info!("Processing {}", folder.display());
 
-        let xmp_path = metadata::get_folder_metadata_path(&folder);
+        let xmp_path = livemeta::get_folder_metadata_path(&folder);
 
         let (mut xmp, new_file) = if xmp_path.exists() {
             (FolderMetadata::from_xmp_file(&xmp_path)?, false)
@@ -101,7 +83,7 @@ where
             (FolderMetadata::new()?, true)
         };
 
-        action(&mut xmp, files)?;
+        action(args, &mut xmp, files)?;
 
         if xmp.is_dirty() {
             xmp.set_creator_tool("Updated by LiveTagger")?;
@@ -112,8 +94,8 @@ where
                 xmp.update_metadata_date()?;
             }
 
-            if commit {
-                if backup {
+            if args.commit {
+                if args.backup {
                     let backup_path = xmp_path.with_extension("xmp.bak");
 
                     fs::rename(&xmp_path, &backup_path)?;
@@ -138,11 +120,11 @@ fn search_for_files(include: &str) -> anyhow::Result<HashMap<PathBuf, HashSet<St
     for entry in glob(include).context("Invalid include glob")? {
         let path = entry.context("Invalid path")?;
 
-        if metadata::is_metadata(&path) || path.is_dir() {
+        if livemeta::is_metadata(&path) || path.is_dir() {
             continue;
         }
 
-        if !metadata::is_supported_sample_format(&path) {
+        if !livemeta::is_supported_sample_format(&path) {
             info!(
                 "Skipping {} as it doesn't look like an audio file",
                 path.display()
