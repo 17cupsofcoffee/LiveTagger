@@ -11,7 +11,7 @@ use clap::{Args, Parser, Subcommand};
 use glob::glob;
 
 use livemeta::{self, FolderMetadata};
-use tracing::info;
+use tracing::{info, warn};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -126,6 +126,10 @@ where
         } else {
             info!("No changes required for {}", folder.display());
         }
+    }
+
+    if !args.commit {
+        warn!("Run again with --commit to apply the above changes!");
     }
 
     Ok(())

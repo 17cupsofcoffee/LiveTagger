@@ -36,7 +36,7 @@ pub fn add_tags(
             }
 
             if !tags_added.is_empty() {
-                info!("Added tags to {}: {}", filename, tags_added.join(", "));
+                info!("Adding tags to {}: {}", filename, tags_added.join(", "));
             }
         }
     }
@@ -54,7 +54,7 @@ pub fn add_tags(
         }
 
         if !tags_added.is_empty() {
-            info!("Added tags to {}: {}", &new_file, tags_added.join(", "));
+            info!("Adding tags to {}: {}", &new_file, tags_added.join(", "));
         }
     }
 
@@ -105,7 +105,7 @@ pub fn remove_tags(
 
             if !tags_removed.is_empty() {
                 info!(
-                    "Removed tags from {}: {}",
+                    "Removing tags from {}: {}",
                     &filename,
                     tags_removed.join(", ")
                 );
@@ -132,7 +132,7 @@ pub fn remove_all_tags(doc: &mut FolderMetadata, mut files: HashSet<String>) -> 
         if files.take(&filename).is_some() {
             doc.delete_keywords(&item)?;
 
-            info!("Removed all tags from {}", &filename);
+            info!("Removing all tags from {}", &filename);
         }
     }
 
