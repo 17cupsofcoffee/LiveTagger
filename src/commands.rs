@@ -3,15 +3,13 @@ use std::collections::HashSet;
 use livemeta::{FolderMetadata, ItemSelector};
 use tracing::info;
 
-use crate::CommandArgs;
-
 /// Adds tags to the specified files.
 ///
 /// If an entry for a file does not exist yet in the metadata document, it will be added.
 pub fn add_tags(
-    args: &CommandArgs,
     doc: &mut FolderMetadata,
     mut files: HashSet<String>,
+    tags: &[String],
 ) -> anyhow::Result<()> {
     let item_count = doc.item_count();
 
@@ -30,7 +28,7 @@ pub fn add_tags(
                 keywords.insert(doc.get_keyword(&item, i)?);
             }
 
-            for tag in &args.tags {
+            for tag in tags {
                 if !keywords.contains(tag) {
                     doc.push_keyword(&item, tag.clone())?;
                     tags_added.push(tag.as_str());
@@ -50,7 +48,7 @@ pub fn add_tags(
 
         doc.set_filename(&item, new_file.clone())?;
 
-        for tag in &args.tags {
+        for tag in tags {
             doc.push_keyword(&item, tag.clone())?;
             tags_added.push(tag.as_str());
         }
@@ -70,9 +68,9 @@ pub fn add_tags(
 /// metadata stored for each file, Ableton could potentially add
 /// additional data in future versions.
 pub fn remove_tags(
-    args: &CommandArgs,
     doc: &mut FolderMetadata,
     mut files: HashSet<String>,
+    tags: &[String],
 ) -> anyhow::Result<()> {
     let item_count = doc.item_count();
 
@@ -93,7 +91,7 @@ pub fn remove_tags(
             for i in (1..=keyword_count).rev() {
                 let keyword = doc.get_keyword(&item, i)?;
 
-                if args.tags.contains(&keyword) {
+                if tags.contains(&keyword) {
                     doc.delete_keyword(&item, i)?;
                     tags_removed.push(keyword);
 
@@ -123,11 +121,7 @@ pub fn remove_tags(
 /// This will not remove the files themselves from the metadata document -
 /// while keywords are currently the only metadata stored for each file,
 /// Ableton could potentially add additional data in future versions.
-pub fn remove_all_tags(
-    _args: &CommandArgs,
-    doc: &mut FolderMetadata,
-    mut files: HashSet<String>,
-) -> anyhow::Result<()> {
+pub fn remove_all_tags(doc: &mut FolderMetadata, mut files: HashSet<String>) -> anyhow::Result<()> {
     let item_count = doc.item_count();
 
     for i in 1..=item_count {
@@ -162,18 +156,7 @@ mod tests {
         files.insert("bd2.wav".into());
         files.insert("bd3.wav".into());
 
-        let tags = vec!["Drums|Kick".into(), "CustomTag".into()];
-
-        add_tags(
-            &CommandArgs {
-                tags,
-                include: String::new(),
-                commit: true,
-                backup: true,
-            },
-            &mut meta,
-            files,
-        )?;
+        add_tags(&mut meta, files, &["Drums|Kick".into(), "CustomTag".into()])?;
 
         assert!(meta.is_dirty());
         pretty_assertions::assert_eq!(meta.to_xml().unwrap(), expected.replace("\r\n", "\n"));
@@ -194,17 +177,10 @@ mod tests {
         files.insert("bd2.wav".into());
         files.insert("bd3.wav".into());
 
-        let tags = vec!["Creator|17cupsofcoffee".into(), "NonExistentTag".into()];
-
         remove_tags(
-            &CommandArgs {
-                tags,
-                include: String::new(),
-                commit: true,
-                backup: true,
-            },
             &mut meta,
             files,
+            &["Creator|17cupsofcoffee".into(), "NonExistentTag".into()],
         )?;
 
         assert!(meta.is_dirty());
@@ -226,16 +202,7 @@ mod tests {
         files.insert("bd2.wav".into());
         files.insert("bd3.wav".into());
 
-        remove_all_tags(
-            &CommandArgs {
-                tags: Vec::new(),
-                include: String::new(),
-                commit: true,
-                backup: true,
-            },
-            &mut meta,
-            files,
-        )?;
+        remove_all_tags(&mut meta, files)?;
 
         assert!(meta.is_dirty());
         pretty_assertions::assert_eq!(meta.to_xml().unwrap(), expected.replace("\r\n", "\n"));

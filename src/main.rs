@@ -24,32 +24,40 @@ struct Cli {
 #[derive(Subcommand, Debug)]
 enum Command {
     /// Adds tags to a set of files.
-    Add(CommandArgs),
+    Add(TagChangeArgs),
 
     /// Removes tags from a set of files.
-    Remove(CommandArgs),
+    Remove(TagChangeArgs),
 
     /// Removes all tags from a set of files.
-    RemoveAll(CommandArgs),
+    RemoveAll(FilesystemArgs),
 }
 
+/// CLI flags for operating on files.
 #[derive(Args, Debug)]
-struct CommandArgs {
+struct FilesystemArgs {
+    /// A glob pattern specifying which files should be processed.
+    #[arg(short, long, global(true), value_name = "GLOB", default_value = "*")]
+    include: String,
+
+    /// Saves changes to the filesystem. Run without this first, to make sure you're tagging the correct files!
+    #[arg(short, long, global(true))]
+    commit: bool,
+
+    /// Creates backups of any changed metadata.
+    #[arg(short, long, global(true))]
+    backup: bool,
+}
+
+/// CLI flags for batch tag operations.
+#[derive(Args, Debug)]
+struct TagChangeArgs {
     /// The tags to apply to the matched files.
     #[arg(required(true))]
     tags: Vec<String>,
 
-    /// A glob pattern specifying which files should be processed.
-    #[arg(short, long, value_name = "GLOB", default_value = "*")]
-    include: String,
-
-    /// Saves changes to the filesystem. Run without this first, to make sure you're tagging the correct files!
-    #[arg(short, long)]
-    commit: bool,
-
-    /// Creates backups of any changed metadata.
-    #[arg(short, long)]
-    backup: bool,
+    #[command(flatten)]
+    fs: FilesystemArgs,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -58,19 +66,28 @@ fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt().with_target(false).init();
 
     match cli.command {
-        Command::Add(args) => process_xmp(&args, commands::add_tags)?,
-        Command::Remove(args) => process_xmp(&args, commands::remove_tags)?,
+        Command::Add(args) => process_xmp(&args.fs, |doc, files| {
+            commands::add_tags(doc, files, &args.tags)
+        })?,
+
+        Command::Remove(args) => process_xmp(&args.fs, |doc, files| {
+            commands::remove_tags(doc, files, &args.tags)
+        })?,
+
         Command::RemoveAll(args) => process_xmp(&args, commands::remove_all_tags)?,
     }
 
     Ok(())
 }
 
-fn process_xmp<F>(args: &CommandArgs, mut action: F) -> anyhow::Result<()>
+/// Finds all files matching the provided parameters, applies some logic to each folder's
+/// metadata document (creating one from scratch if needed), then saves to disk if
+/// changes have been made.
+fn process_xmp<F>(args: &FilesystemArgs, mut action: F) -> anyhow::Result<()>
 where
-    F: FnMut(&CommandArgs, &mut FolderMetadata, HashSet<String>) -> anyhow::Result<()>,
+    F: FnMut(&mut FolderMetadata, HashSet<String>) -> anyhow::Result<()>,
 {
-    let folders = search_for_files(&args.include)?;
+    let folders = search_for_sample_folders(&args.include)?;
 
     for (folder, files) in folders {
         info!("Processing {}", folder.display());
@@ -83,7 +100,7 @@ where
             (FolderMetadata::new()?, true)
         };
 
-        action(args, &mut xmp, files)?;
+        action(&mut xmp, files)?;
 
         if xmp.is_dirty() {
             xmp.set_creator_tool("Updated by LiveTagger")?;
@@ -114,7 +131,8 @@ where
     Ok(())
 }
 
-fn search_for_files(include: &str) -> anyhow::Result<HashMap<PathBuf, HashSet<String>>> {
+/// Finds all sample files matching a given glob, as well as their corresponding parent folders.
+fn search_for_sample_folders(include: &str) -> anyhow::Result<HashMap<PathBuf, HashSet<String>>> {
     let mut folders: HashMap<PathBuf, HashSet<String>> = HashMap::new();
 
     for entry in glob(include).context("Invalid include glob")? {
