@@ -32,21 +32,17 @@ jobs:
     - name: Build
       shell: bash
       run: |
+        tag=$(git describe --tags --abbrev=0)
+
         cargo build --release --target ${{ matrix.target }}
 
         if [ "${{ matrix.os }}" = "windows-latest" ]; then
-          bin="target/${{ matrix.target }}/release/livetagger.exe"
+          bin="./target/${{ matrix.target }}/release/livetagger.exe"
         else
-          bin="target/${{ matrix.target }}/release/livetagger"
+          bin="./target/${{ matrix.target }}/release/livetagger"
         fi
 
-        echo "BIN=$bin" >> $GITHUB_ENV
-    - name: Zip artifacts
-      shell: bash
-      run: |
-        tag=$(git describe --tags --abbrev=0)
-
-        7z a "livetagger-$tag-${{ matrix.target }}.zip" $BIN
+        7z a "livetagger-$tag-${{ matrix.target }}.zip" $bin
     - name: Publish
       uses: softprops/action-gh-release@v2
       with:
