@@ -46,7 +46,7 @@ jobs:
       run: |
         tag=$(git describe --tags --abbrev=0)
 
-        7z a "livetagger-$tag-${{ matrix.target }}-x64.zip" $bin
+        7z a "livetagger-$tag-${{ matrix.target }}.zip" $bin
     - name: Publish
       uses: softprops/action-gh-release@v2
       with:
