@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    name: ${{ matrix.target }}
+
+    permissions:
+      contents: write
+
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+          - target: x86_64-apple-darwin
+            os: macos-13
+          - target: aarch64-apple-darwin
+            os: macos-latest
+      
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: stable
+        target: ${{ matrix.target }}
+    - name: Build
+      run: |
+        cargo build --release --target ${{ matrix.target }}
+
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+          bin="target/${{ matrix.target }}/release/livetagger.exe"
+        else
+          bin="target/${{ matrix.target }}/release/livetagger"
+        fi
+
+        echo "BIN=$bin" >> $GITHUB_ENV
+    - name: Zip artifacts
+      run: |
+        tag=$(git describe --tags --abbrev=0)
+
+        7z a "livetagger-$tag-$target-x64.zip" $bin
+    - name: Publish
+      uses: softprops/action-gh-release@v2
+      with:
+        files: "livetagger*"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
