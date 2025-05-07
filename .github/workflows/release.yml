@@ -30,6 +30,7 @@ jobs:
         toolchain: stable
         target: ${{ matrix.target }}
     - name: Build
+      shell: bash
       run: |
         cargo build --release --target ${{ matrix.target }}
 
@@ -41,6 +42,7 @@ jobs:
 
         echo "BIN=$bin" >> $GITHUB_ENV
     - name: Zip artifacts
+      shell: bash
       run: |
         tag=$(git describe --tags --abbrev=0)
 
