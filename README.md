@@ -13,7 +13,7 @@ It allows you to quickly automate tasks that would be tedious to do via Live's U
 
 To download LiveTagger, go to the [releases page](https://github.com/17cupsofcoffee/LiveTagger/releases) and download the .zip file for your platform. Extract this into a location that is on your system `PATH`.
 
-Alternatively, if you want to build from source, clone this repo and run `dotnet publish src`.
+Alternatively, if you want to build from source, clone this repo and run `cargo build`.
 
 ## Usage
 
@@ -31,6 +31,8 @@ This command has various options you can use to tweak the behaviour:
 * `--commit` (or `-c`) makes the command save its changes.
     * Without this, the command will just log what files would be impacted.
     * **I strongly suggest running without `--commit` before making any big changes, to make sure the command is going to do what you're expecting!**
+* `--backup` (or `-b`) will create a backup of any files that are changed.
+    * To restore a backup, go to the `Ableton Folder Info` subdirectory next to the files you tagged, and rename the `.xmp.bak` file to `.xmp`.
 
 There are also several other commands available:
 
@@ -47,5 +49,4 @@ If you specify a category/tag/subtag that does not exist, Live will create it au
 
 ## Notes
 
-* This tool works by manually modifying the XMP metadata files that Live creates. If Ableton change the format of those files, this tool will probably break!
-* Whenever LiveTagger makes a change to the metadata, it will write a backup first. If you need to revert the changes, go to the `Ableton Folder Info` subfolder of the folder you ran the tool on, and replace the `.xmp` file with the backup. Later versions may add commands for this. 
+* This tool works by manually modifying the XMP metadata files that Live creates. If Ableton change the format of those files, this tool may break!

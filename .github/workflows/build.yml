@@ -11,21 +11,28 @@ on:
 
 jobs:
   build:
+    name: ${{ matrix.target }}
+
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        include:
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+          - target: x86_64-apple-darwin
+            os: macos-13
+          - target: aarch64-apple-darwin
+            os: macos-latest
         
     runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+    - uses: dtolnay/rust-toolchain@master
       with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
+        toolchain: stable
+        target: ${{ matrix.target }}
     - name: Build
-      run: dotnet build --no-restore
+      run:
+        cargo build --all --target ${{ matrix.target }}
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: cargo test --all --target ${{ matrix.target }}

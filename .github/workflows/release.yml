@@ -1,6 +1,3 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
 name: Release
 
 on:
@@ -9,29 +6,45 @@ on:
 
 jobs:
   release:
+    name: ${{ matrix.target }}
+
     permissions:
       contents: write
+
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+          - target: x86_64-apple-darwin
+            os: macos-13
+          - target: aarch64-apple-darwin
+            os: macos-latest
       
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+    - uses: dtolnay/rust-toolchain@master
       with:
-        dotnet-version: 8.0.x
-    - name: Publish
+        toolchain: stable
+        target: ${{ matrix.target }}
+    - name: Build
       run: |
-        dotnet publish src -r win-x64
-        dotnet publish src -r osx-x64
-        dotnet publish src -r osx-arm64
+        cargo build --release --target ${{ matrix.target }}
+
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+          bin="target/${{ matrix.target }}/release/livetagger.exe"
+        else
+          bin="target/${{ matrix.target }}/release/livetagger"
+        fi
+
+        echo "BIN=$bin" >> $GITHUB_ENV
     - name: Zip artifacts
       run: |
         tag=$(git describe --tags --abbrev=0)
 
-        7z a "livetagger-$tag-win-x64.zip" "./src/bin/Release/net8.0/win-x64/publish/*"
-        7z a "livetagger-$tag-osx-x64.zip" "./src/bin/Release/net8.0/osx-x64/publish/*"
-        7z a "livetagger-$tag-osx-arm64.zip" "./src/bin/Release/net8.0/osx-arm64/publish/*"
+        7z a "livetagger-$tag-$target-x64.zip" $bin
     - name: Publish
       uses: softprops/action-gh-release@v2
       with:
