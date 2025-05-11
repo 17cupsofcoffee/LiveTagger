@@ -3,6 +3,7 @@ name: Release
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   release:
@@ -29,6 +30,11 @@ jobs:
       with:
         toolchain: stable
         target: ${{ matrix.target }}
+    - name: Document licenses
+      shell: bash
+      run: | 
+        cargo install --locked cargo-about
+        cargo about generate about.hbs -o licenses.html
     - name: Build
       shell: bash
       run: |
@@ -42,9 +48,15 @@ jobs:
           bin="./target/${{ matrix.target }}/release/livetagger"
         fi
 
-        7z a "livetagger-$tag-${{ matrix.target }}.zip" $bin
+        7z a "livetagger-$tag-${{ matrix.target }}.zip" $bin licenses.html
+    - name: Attach artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.target }}
+        path: livetagger*
     - name: Publish
       uses: softprops/action-gh-release@v2
+      if: github.event_name = "release"
       with:
         files: "livetagger*"
       env:

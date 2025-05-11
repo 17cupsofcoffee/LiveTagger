@@ -2,6 +2,7 @@
 name = "livetagger"
 version = "0.0.4"
 edition = "2024"
+license = "MIT"
 
 [workspace]
 resolver = "3"
