@@ -38,7 +38,11 @@ jobs:
     - name: Build
       shell: bash
       run: |
-        tag=$(git describe --tags --abbrev=0)
+        if [ "${{ github.event_name }}" = "release" ]; then
+          tag=$(git describe --tags --abbrev=0)
+        else
+          tag="manual-build"
+        fi
 
         cargo build --release --target ${{ matrix.target }}
 
