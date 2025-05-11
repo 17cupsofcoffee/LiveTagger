@@ -56,7 +56,7 @@ jobs:
         path: livetagger*
     - name: Publish
       uses: softprops/action-gh-release@v2
-      if: github.event_name == "release"
+      if: github.event_name == 'release'
       with:
         files: "livetagger*"
       env:
