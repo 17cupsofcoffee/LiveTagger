@@ -10,6 +10,11 @@
                 <rdf:Bag>
                     <rdf:li rdf:parseType="Resource">
                         <ablFR:filePath>bd1.wav</ablFR:filePath>
+                        <ablFR:colors>
+                            <rdf:Bag>
+                                <rdf:li>1</rdf:li>
+                            </rdf:Bag>
+                        </ablFR:colors>
                     </rdf:li>
                     <rdf:li rdf:parseType="Resource">
                         <ablFR:filePath>bd2.wav</ablFR:filePath>

@@ -163,10 +163,6 @@ impl FolderMetadata {
     }
 
     /// Deletes a keyword from an item in the document.
-    ///
-    /// This will not remove the item itself, even if all the keywords are gone -
-    /// while keywords are currently the only metadata stored for each file,
-    /// Ableton could potentially add additional data in future versions.
     pub fn delete_keyword(&mut self, item: &ItemSelector, i: usize) -> Result {
         self.xmp
             .delete_array_item(ABLETON_NS, &item.keywords.value, i as i32)?;
@@ -177,10 +173,6 @@ impl FolderMetadata {
     }
 
     /// Deletes all keywords from an item in the document.
-    ///
-    /// This will not remove the item itself - while keywords are currently the
-    /// only metadata  stored for each file, Ableton could potentially add
-    /// additional data in future versions.
     pub fn delete_keywords(&mut self, item: &ItemSelector) -> Result {
         self.xmp.delete_property(ABLETON_NS, &item.keywords.value)?;
 
