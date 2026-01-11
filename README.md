@@ -6,6 +6,7 @@ It allows you to quickly automate tasks that would be tedious to do via Live's U
 
 > [!CAUTION]
 > * This software is **not** endorsed or supported by Ableton.
+> * It was last tested with **Live 12.3**. Updates may cause this tool to break.
 > * Careless use (or bugs) may mess up your existing manual tagging.
 > * **Use at your own risk!**
 
