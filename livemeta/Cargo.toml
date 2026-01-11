@@ -7,4 +7,4 @@ publish = false
 
 [dependencies]
 thiserror = "2.0.12"
-xmp_toolkit = "1.9.2"
+xmp_toolkit = "1.12.0"
